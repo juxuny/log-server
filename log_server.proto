@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option go_package = "github.com/juxuny/log-server";
+
+package log_server;
+
+service LogServer {
+  rpc Add(AddReq) returns (AddResp) {}
+  rpc Ping(PingReq) returns (PingResp) {}
+  rpc Info(InfoReq) returns (InfoResp) {}
+}
+
+message AddReq {
+
+}
+
+message AddResp {
+
+}
+
+
+message PingReq {
+
+}
+
+message PingResp {
+
+}
+
+message InfoReq {
+
+}
+
+message InfoResp {
+
+}
