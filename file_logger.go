@@ -11,7 +11,7 @@ type FileNameGenerator interface {
 	Gen(app string) string
 }
 
-type FileLogger struct {
+type fileLogger struct {
 	dir             string
 	currentFileName string
 	currentFile     *os.File
@@ -24,7 +24,7 @@ func NewDefaultFileLogger(dir string, cacheSize, flushDurationSecond int) Logger
 }
 
 func NewFileLogger(dir string, cacheSize int, flushDuration int, generator FileNameGenerator) Logger {
-	logger := FileLogger{
+	logger := fileLogger{
 		dir:       dir,
 		generator: generator,
 	}
@@ -32,7 +32,7 @@ func NewFileLogger(dir string, cacheSize int, flushDuration int, generator FileN
 	return &logger
 }
 
-func (t *FileLogger) Info(app string, msg string) error {
+func (t *fileLogger) Info(app string, msg string) error {
 	if len(msg) > 0 && msg[len(msg)-1] != '\n' {
 		msg += "\n"
 	}
@@ -59,14 +59,14 @@ func (t *FileLogger) Info(app string, msg string) error {
 	return t.buffer.Append(msg)
 }
 
-func (t *FileLogger) onFlush(data []byte) error {
+func (t *fileLogger) onFlush(data []byte) error {
 	if _, err := t.currentFile.Write(data); err != nil {
 		return errors.Wrap(err, "flush data failed")
 	}
 	return nil
 }
 
-func (t *FileLogger) generateFileName(app string) string {
+func (t *fileLogger) generateFileName(app string) string {
 	return t.generator.Gen(app)
 }
 

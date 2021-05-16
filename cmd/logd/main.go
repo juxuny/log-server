@@ -15,16 +15,25 @@ var (
 	certFile string
 	keyFile  string
 	logger   = log.NewLogger("[logd]")
+
+	fileLogger           log_server.Logger
+	logDir               string
+	flushDurationSeconds int
+	cacheSize            int
 )
 
 func init() {
 	flag.StringVar(&certFile, "cert", "cert/server-cert.pem", "cert file")
 	flag.StringVar(&keyFile, "key", "cert/server-key.pem", "cert key file")
+	flag.StringVar(&logDir, "d", "log", "directory for log data")
+	flag.IntVar(&flushDurationSeconds, "flush", 30, "flush duration")
+	flag.IntVar(&cacheSize, "size", 10000, "cache size")
 	flag.IntVar(&port, "p", 40000, "listen port")
 }
 
 func main() {
 	flag.Parse()
+	fileLogger = log_server.NewDefaultFileLogger(logDir, cacheSize, flushDurationSeconds)
 	addr := fmt.Sprintf(":%d", port)
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {

@@ -11,6 +11,7 @@ type server struct {
 
 func (t *server) Add(ctx context.Context, req *log_server.AddReq) (resp *log_server.AddResp, err error) {
 	resp = &log_server.AddResp{}
+	err = fileLogger.Info(req.App, req.Data)
 	return resp, nil
 }
 
