@@ -11,11 +11,12 @@ service LogServer {
 }
 
 message AddReq {
-
+  string app = 1;
+  string data = 2;
 }
 
 message AddResp {
-
+  string msg = 1;
 }
 
 
