@@ -23,8 +23,8 @@ var (
 )
 
 func init() {
-	flag.StringVar(&certFile, "cert", "cert/server-cert.pem", "cert file")
-	flag.StringVar(&keyFile, "key", "cert/server-key.pem", "cert key file")
+	flag.StringVar(&certFile, "cert", "", "cert file")
+	flag.StringVar(&keyFile, "key", "", "cert key file")
 	flag.StringVar(&logDir, "d", "log", "directory for log data")
 	flag.IntVar(&flushDurationSeconds, "flush", 30, "flush duration")
 	flag.IntVar(&cacheSize, "size", 10000, "cache size")
@@ -44,14 +44,16 @@ func main() {
 			logger.Error(err)
 		}
 	}()
-	tlsCredentials, err := loadTLSCredentials()
-	if err != nil {
-		logger.Error("cannot load TLS credentials: ", err)
-		os.Exit(-1)
+	opts := make([]grpc.ServerOption, 0)
+	if certFile != "" {
+		tlsCredentials, err := loadTLSCredentials()
+		if err != nil {
+			logger.Error("cannot load TLS credentials: ", err)
+			os.Exit(-1)
+		}
+		opts = append(opts, grpc.Creds(tlsCredentials))
 	}
-	s := grpc.NewServer(
-		grpc.Creds(tlsCredentials),
-	)
+	s := grpc.NewServer(opts...)
 	fmt.Println("listen", addr)
 	log_server.RegisterLogServerServer(s, &server{})
 	if err := s.Serve(ln); err != nil {

@@ -50,12 +50,18 @@ func loadTLSCredentials(certFile string) (credentials.TransportCredentials, erro
 }
 
 func getClient(ctx context.Context, host string, certFile string) (client LogServerClient, err error) {
-	tlsCredentials, err := loadTLSCredentials(certFile)
-	if err != nil {
-		return client, errors.Wrap(err, "load cert failed")
+	opts := make([]grpc.DialOption, 0)
+	if certFile != "" {
+		tlsCredentials, err := loadTLSCredentials(certFile)
+		if err != nil {
+			return client, errors.Wrap(err, "load cert failed")
+		}
+		opts = append(opts, grpc.WithTransportCredentials(tlsCredentials))
+	} else {
+		opts = append(opts, grpc.WithInsecure())
 	}
 
-	conn, err := grpc.DialContext(ctx, host, grpc.WithTransportCredentials(tlsCredentials))
+	conn, err := grpc.DialContext(ctx, host, opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "connect failed")
 	}
