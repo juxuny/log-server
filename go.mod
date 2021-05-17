@@ -4,9 +4,10 @@ go 1.15
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/juxuny/env v0.0.0-20210423031215-8722478bebae
-	github.com/juxuny/supervisor v0.0.0-20210508011346-53f16a490dc3
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
-	google.golang.org/grpc v1.37.0
+	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
+	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
+	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
+	google.golang.org/grpc v1.37.1
 )
