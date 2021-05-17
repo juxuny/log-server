@@ -3,7 +3,6 @@ package log_server
 import (
 	"context"
 	"fmt"
-	"github.com/juxuny/log-server/log"
 	"github.com/pkg/errors"
 	"math/rand"
 	"os"
@@ -12,7 +11,9 @@ import (
 	"time"
 )
 
-var logger = log.NewLogger("[LOG]")
+type ClientPool interface {
+	Add(ctx context.Context, app, data string) error
+}
 
 type clientPool struct {
 	list    []*client
@@ -20,7 +21,7 @@ type clientPool struct {
 	reqPool *sync.Pool
 }
 
-func NewClientPool(cert string, host ...string) (*clientPool, error) {
+func NewClientPool(cert string, host ...string) (ClientPool, error) {
 	pool := &clientPool{}
 	pool.rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	pool.list = make([]*client, len(host))
