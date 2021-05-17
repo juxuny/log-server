@@ -32,6 +32,10 @@ func NewFileLogger(dir string, cacheSize int, flushDuration int, generator FileN
 	return &logger
 }
 
+func (t *fileLogger) Flush() error {
+	return t.buffer.Flush()
+}
+
 func (t *fileLogger) Info(app string, msg string) error {
 	if len(msg) > 0 && msg[len(msg)-1] != '\n' {
 		msg += "\n"
@@ -60,6 +64,9 @@ func (t *fileLogger) Info(app string, msg string) error {
 }
 
 func (t *fileLogger) onFlush(data []byte) error {
+	if t.currentFile == nil {
+		return nil
+	}
 	if _, err := t.currentFile.Write(data); err != nil {
 		return errors.Wrap(err, "flush data failed")
 	}

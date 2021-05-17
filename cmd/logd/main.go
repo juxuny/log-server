@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	log_server "github.com/juxuny/log-server"
@@ -8,6 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 var (
@@ -39,11 +43,6 @@ func main() {
 	if err != nil {
 		logger.Error("failed to listen:", err)
 	}
-	defer func() {
-		if err := ln.Close(); err != nil {
-			logger.Error(err)
-		}
-	}()
 	opts := make([]grpc.ServerOption, 0)
 	if certFile != "" {
 		tlsCredentials, err := loadTLSCredentials()
@@ -56,7 +55,38 @@ func main() {
 	s := grpc.NewServer(opts...)
 	fmt.Println("listen", addr)
 	log_server.RegisterLogServerServer(s, &server{})
-	if err := s.Serve(ln); err != nil {
-		logger.Error("failed to serve:", err)
+
+	go func() {
+		if err := s.Serve(ln); err != nil {
+			logger.Error("failed to serve:", err)
+		}
+	}()
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can"t be catch, so don't need add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Info("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	finished := make(chan bool)
+	go func() {
+		s.Stop()
+		logger.Info("flush log data")
+		if err := fileLogger.Flush(); err != nil {
+			logger.Error(err)
+		}
+		finished <- true
+	}()
+	// catching ctx.Done(). timeout of 5 seconds.
+	select {
+	case <-finished:
+		logger.Info("server shutdown properly")
+	case <-ctx.Done():
+		logger.Info("timeout of 15 seconds.")
 	}
 }
