@@ -43,7 +43,7 @@ func (t *fileLogger) Info(app string, msg string) error {
 	var err error
 	genFileName := t.generateFileName(app)
 	if t.currentFile == nil {
-		t.currentFile, err = os.Create(genFileName)
+		t.currentFile, err = os.OpenFile(genFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		t.currentFileName = genFileName
 		if err != nil {
 			return errors.Wrap(err, "create log file failed")
@@ -54,7 +54,7 @@ func (t *fileLogger) Info(app string, msg string) error {
 			return err
 		}
 		_ = t.currentFile.Close()
-		t.currentFile, err = os.Create(genFileName)
+		t.currentFile, err = os.OpenFile(genFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		t.currentFileName = genFileName
 		if err != nil {
 			return errors.Wrap(err, "create log file failed")
