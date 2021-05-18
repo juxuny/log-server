@@ -12,7 +12,7 @@ x-default: &default
       max-file: "5"
 services:
   srv:
-    image: juxuny/log-server:v0.0.1
+    image: juxuny/log-server:v0.0.6
     entrypoint:
       - /app/logd
       - "-d=/app/log"
