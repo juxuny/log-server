@@ -16,11 +16,13 @@ services:
     ports:
       - "40000:40000"
   cleaner:
-    image: juxuny/log-server:v0.0.6
+    image: juxuny/log-server:v0.1.0
     entrypoint:
-      - /app/cleaner
-      - --dir log --script "tar czf ${FILE_NAME}.tar.gz" --keep 2d --ext log
+      - sh
+      - cleaner-entrypoint.sh
     restart: always
     volumes:
+      - ./compress.sh:/app/compress.sh
+      - ./cleaner-entrypoint.sh:/app/cleaner-entrypoint.sh
       - ./tmp:/app/log
     
