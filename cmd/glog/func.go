@@ -46,11 +46,6 @@ func convertTimeToFileList(prefix string, start, end string) (ret []string, err 
 	return ret, nil
 }
 
-func Fatal(v ...interface{}) {
-	fmt.Println(v...)
-	os.Exit(-1)
-}
-
 func grep(fileName, expr string) error {
 	sh := fmt.Sprintf("cat %s | grep \"%s\"", fileName, expr)
 	cmd := exec.Command("sh")
