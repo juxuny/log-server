@@ -6,7 +6,7 @@ x-default: &default
       max-file: "5"
 services:
   srv:
-    image: juxuny/log-server:v0.0.1
+    image: juxuny/log-server:v0.0.6
     entrypoint: 
       - /app/logd
       - "-d=/app/log"
@@ -15,4 +15,12 @@ services:
       - ./tmp:/app/log
     ports:
       - "40000:40000"
+  cleaner:
+    image: juxuny/log-server:v0.0.6
+    entrypoint:
+      - /app/cleaner
+      - --dir log --script "tar czf ${FILE_NAME}.tar.gz" --keep 2d --ext log
+    restart: always
+    volumes:
+      - ./tmp:/app/log
     
