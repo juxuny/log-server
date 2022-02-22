@@ -24,6 +24,12 @@ services:
     
 ```
 
+## Install `glog`
+
+```bash
+GOPROXY=https://goproxy.cn GO111MODULE=on go install github.com/juxuny/log-server/cmd/glog@latest
+```
+
 ## Other
 
 ```shell
